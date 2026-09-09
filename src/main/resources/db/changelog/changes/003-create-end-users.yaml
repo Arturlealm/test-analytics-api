@@ -1,0 +1,78 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-end-users
+      author: artur
+      changes:
+        - createTable:
+            tableName: end_users
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: application_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: external_id
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: age_range
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: region
+                  type: VARCHAR(255)
+
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+
+        - addForeignKeyConstraint:
+            baseTableName: end_users
+            baseColumnNames: application_id
+            referencedTableName: applications
+            referencedColumnNames: id
+            constraintName: fk_end_users_application
+
+        - addUniqueConstraint:
+            tableName: end_users
+            columnNames: application_id, external_id
+            constraintName: uk_end_users_application_external_id
+
+        - createIndex:
+            tableName: end_users
+            indexName: idx_end_users_application_id
+            columns:
+              - column:
+                  name: application_id
+
+        - createIndex:
+            tableName: end_users
+            indexName: idx_end_users_status
+            columns:
+              - column:
+                  name: status

@@ -48,4 +48,24 @@ public class GlobalExceptionHandler {
 
         return problem;
     }
+
+    @ExceptionHandler (InvalidApiKeyException.class)
+    public ProblemDetail handleInvalidApiKey(InvalidApiKeyException exception){
+
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, exception.getMessage());
+
+        problem.setTitle("Unauthorized");
+
+        return problem;
+    }
+
+    @ExceptionHandler (EndUserNotFoundException.class)
+    public ProblemDetail handleEndUserNotFound(EndUserNotFoundException exception){
+
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        problem.setTitle("Not Found");
+        problem.setDetail(exception.getMessage());
+
+        return problem;
+    }
 }
