@@ -1,0 +1,68 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-feature-events
+      author: artur
+
+      changes:
+        - createTable:
+            tableName: feature_events
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: application_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_feature_events_application
+                    references: applications(id)
+
+              - column:
+                  name: end_user_id
+                  type: UUID
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_feature_events_end_user
+                    references: end_users(id)
+
+              - column:
+                  name: feature_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: occurred_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: metadata
+                  type: JSONB
+
+        - createIndex:
+            tableName: feature_events
+            indexName: idx_feature_events_application_id
+            columns:
+              - column:
+                  name: application_id
+
+        - createIndex:
+            tableName: feature_events
+            indexName: idx_feature_events_end_user_id
+            columns:
+              - column:
+                  name: end_user_id
+
+        - createIndex:
+            tableName: feature_events
+            indexName: idx_feature_events_occurred_at
+            columns:
+              - column:
+                  name: occurred_at
