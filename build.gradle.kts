@@ -30,6 +30,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	implementation("com.github.f4b6a3:uuid-creator:6.1.1")
 }
 
 tasks.withType<Test> {
