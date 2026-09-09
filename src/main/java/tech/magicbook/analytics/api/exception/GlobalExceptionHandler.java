@@ -38,4 +38,14 @@ public class GlobalExceptionHandler {
 
         return problem;
     }
+
+    @ExceptionHandler (ApiKeyNotFoundException.class)
+    public ProblemDetail handleApiKeyNotFound(ApiKeyNotFoundException exception){
+
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
+
+        problem.setTitle("API key not found");
+
+        return problem;
+    }
 }
