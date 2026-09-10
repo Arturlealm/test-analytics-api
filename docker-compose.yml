@@ -14,5 +14,25 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: analytics-api
+
+    depends_on:
+      - postgres
+
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/analytics
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: change-this-secret-change-this-secret
+      JWT_EXPIRATION: 3600
+
+    ports:
+      - "8080:8080"
+
 volumes:
   postgres_data:
