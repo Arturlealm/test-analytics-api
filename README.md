@@ -284,6 +284,14 @@ Durante o desenvolvimento foram adotadas algumas decisões para manter a API org
 - `ProblemDetail` para padronização das respostas de erro.
 - Docker e Docker Compose para facilitar a execução do ambiente.
 
+
+Devido ao prazo disponível para o desafio, foram priorizados os fluxos principais e os requisitos funcionais da API.
+
+Como melhorias futuras, poderiam ser adicionados testes de integração completos utilizando Testcontainers com PostgreSQL, 
+maior cobertura automatizada dos endpoints e validações adicionais nos parâmetros de paginação e ordenação.
+
+Os itens opcionais e bônus não foram priorizados durante a implementação.
+
 ## Observações
 
 - O projeto utiliza UUID versão 7 como identificador das entidades.
