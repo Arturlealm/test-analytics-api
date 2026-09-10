@@ -4,6 +4,14 @@ API backend desenvolvida em Java com Spring Boot para gerenciamento de aplicaç�
 
 O projeto permite registrar aplicações, gerar chaves de API, receber eventos de uso e consultar dados através de endpoints protegidos por autenticação JWT.
 
+## Documentação da API
+
+A documentação dos endpoints pode ser visualizada através do Swagger UI:
+
+**[Acessar Swagger UI](https://arturlealm.github.io/test-analytics-api/)**
+
+> A versão publicada no GitHub Pages permite visualizar a documentação da API sem a necessidade de executar o projeto localmente.
+
 ## Tecnologias utilizadas
 
 - Java 25
