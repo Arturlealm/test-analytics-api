@@ -131,6 +131,73 @@ A chave é exibida no momento da criação e armazenada no banco somente atravé
 
 ## Principais endpoints
 
+## Exemplo de uso
+
+Abaixo está um exemplo simples do fluxo principal da API.
+
+### 1. Realizar login
+
+Primeiro, obtenha um token JWT utilizando o usuário administrador:
+
+```bash
+curl -X POST http://localhost:8080/v1/auth/tokens \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@analytics.local",
+    "password": "admin123"
+  }'
+```
+
+A resposta contém o token que será utilizado nos endpoints administrativos.
+
+### 2. Criar uma aplicação
+
+Utilize o token JWT retornado no login:
+
+```bash
+curl -X POST http://localhost:8080/v1/applications \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer SEU_TOKEN" \
+  -d '{
+    "name": "Minha Aplicacao",
+    "description": "Aplicacao utilizada como exemplo"
+  }'
+```
+
+Guarde o `id` retornado pela aplicação.
+
+### 3. Gerar uma API Key
+
+Com o identificador da aplicação criada:
+
+```bash
+curl -X POST http://localhost:8080/v1/applications/APPLICATION_ID/api-keys \
+  -H "Authorization: Bearer SEU_TOKEN"
+```
+
+A resposta contém a API Key no campo `key`.
+
+A chave deve ser guardada nesse momento, pois posteriormente somente seu hash permanece armazenado no banco.
+
+### 4. Enviar dados para a API
+
+Os endpoints de ingestão utilizam a API Key através do header `X-Api-Key`.
+
+Exemplo de criação de um usuário final:
+
+```bash
+curl -X POST http://localhost:8080/v1/end-users \
+  -H "Content-Type: application/json" \
+  -H "X-Api-Key: SUA_API_KEY" \
+  -d '{
+    "externalId": "user-001",
+    "ageRange": "25_34",
+    "region": "PE"
+  }'
+```
+
+Esse mesmo modelo de autenticação por API Key é utilizado nos endpoints de ingestão de Feature Events e AI Usages.
+
 ### Autenticação
 
 `POST /v1/auth/tokens`
@@ -202,16 +269,31 @@ O projeto foi organizado em camadas:
 - `config`: configurações de segurança e da aplicação
 - `util`: classes utilitárias utilizadas pelo projeto
 
+## Decisões técnicas
+
+Durante o desenvolvimento foram adotadas algumas decisões para manter a API organizada e próxima de um cenário real de uso:
+
+- Utilização de UUIDv7 para os identificadores das entidades.
+- PostgreSQL como banco de dados relacional.
+- Liquibase para criação e versionamento da estrutura do banco.
+- JWT para autenticação dos endpoints administrativos e de consulta.
+- API Keys para autenticação dos endpoints responsáveis pela ingestão de dados.
+- Armazenamento apenas do hash das API Keys.
+- Specifications do Spring Data JPA para construção dos filtros dinâmicos.
+- Paginação nas consultas que podem retornar múltiplos registros.
+- `ProblemDetail` para padronização das respostas de erro.
+- Docker e Docker Compose para facilitar a execução do ambiente.
+
 ## Observações
 
-- O projeto utiliza UUID versão 7 como identificador das entidades. 
-Para sua geração foi utilizada a biblioteca `uuid-creator`, já que o UUIDv7 não é gerado nativamente pela estrutura utilizada no projeto.
+- O projeto utiliza UUID versão 7 como identificador das entidades.
+  Para sua geração foi utilizada a biblioteca `uuid-creator`, já que o UUIDv7 não é gerado nativamente pela estrutura utilizada no projeto.
 
-- Os erros da API seguem o padrão `ProblemDetail`, 
-permitindo respostas de erro padronizadas e mais fáceis de interpretar.
+- Os erros da API seguem o padrão `ProblemDetail`,
+  permitindo respostas de erro padronizadas e mais fáceis de interpretar.
 
-- A autenticação JWT utiliza os módulos `spring-boot-starter-oauth2-resource-server` e `spring-security-oauth2-jose` do Spring Security para geração, 
-validação e processamento dos tokens.
+- A autenticação JWT utiliza os módulos `spring-boot-starter-oauth2-resource-server` e `spring-security-oauth2-jose` do Spring Security para geração,
+  validação e processamento dos tokens.
 
 - As alterações na estrutura do banco de dados são versionadas através do Liquibase, permitindo que o schema seja criado e atualizado junto com a aplicação.
 
