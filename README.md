@@ -134,6 +134,7 @@ A chave é exibida no momento da criação e armazenada no banco somente atravé
 ## Exemplo de uso
 
 Abaixo está um exemplo simples do fluxo principal da API.
+> Os exemplos abaixo utilizam Bash. No Windows, os comandos podem ser executados através do Git Bash.
 
 ### 1. Realizar login
 
