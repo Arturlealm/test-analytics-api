@@ -133,6 +133,10 @@ A chave é exibida no momento da criação e armazenada no banco somente atravé
 
 ## Exemplo de uso
 
+Também está disponível na raiz do projeto o arquivo `requests.http`, contendo exemplos executáveis do fluxo principal da API.
+
+O arquivo pode ser utilizado no VS Code com a extensão REST Client e permite executar o fluxo de autenticação, criação de aplicação, geração de API Key e ingestão de dados reutilizando automaticamente os valores retornados pelas requisições anteriores.
+
 Abaixo está um exemplo simples do fluxo principal da API.
 > Os exemplos abaixo utilizam Bash. No Windows, os comandos podem ser executados através do Git Bash.
 
@@ -141,8 +145,8 @@ Abaixo está um exemplo simples do fluxo principal da API.
 Primeiro, obtenha um token JWT utilizando o usuário administrador:
 
 ```bash
-curl -X POST http://localhost:8080/v1/auth/tokens \
-  -H "Content-Type: application/json" \
+curl -X POST http://localhost:8080/v1/auth/tokens
+  -H "Content-Type: application/json"
   -d '{
     "email": "admin@analytics.local",
     "password": "admin123"
@@ -156,12 +160,12 @@ A resposta contém o token que será utilizado nos endpoints administrativos.
 Utilize o token JWT retornado no login:
 
 ```bash
-curl -X POST http://localhost:8080/v1/applications \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer SEU_TOKEN" \
+curl -X POST http://localhost:8080/v1/applications
+  -H "Content-Type: application/json"
+  -H "Authorization: Bearer SEU_TOKEN"
   -d '{
-    "name": "Minha Aplicacao",
-    "description": "Aplicacao utilizada como exemplo"
+    "name": "Analytics Test Application",
+    "description": "Application used to demonstrate the Analytics API"
   }'
 ```
 
@@ -172,7 +176,7 @@ Guarde o `id` retornado pela aplicação.
 Com o identificador da aplicação criada:
 
 ```bash
-curl -X POST http://localhost:8080/v1/applications/APPLICATION_ID/api-keys \
+curl -X POST http://localhost:8080/v1/applications/APPLICATION_ID/api-keys
   -H "Authorization: Bearer SEU_TOKEN"
 ```
 
@@ -187,9 +191,9 @@ Os endpoints de ingestão utilizam a API Key através do header `X-Api-Key`.
 Exemplo de criação de um usuário final:
 
 ```bash
-curl -X POST http://localhost:8080/v1/end-users \
-  -H "Content-Type: application/json" \
-  -H "X-Api-Key: SUA_API_KEY" \
+curl -X POST http://localhost:8080/v1/end-users
+  -H "Content-Type: application/json"
+  -H "X-Api-Key: SUA_API_KEY"
   -d '{
     "externalId": "user-001",
     "ageRange": "25_34",
@@ -286,12 +290,13 @@ Durante o desenvolvimento foram adotadas algumas decisões para manter a API org
 - Docker e Docker Compose para facilitar a execução do ambiente.
 
 
-Devido ao prazo disponível para o desafio, foram priorizados os fluxos principais e os requisitos funcionais da API.
+Devido ao prazo disponível para o desafio, foram priorizados os requisitos obrigatórios e os principais fluxos da API.
 
-Como melhorias futuras, poderiam ser adicionados testes de integração completos utilizando Testcontainers com PostgreSQL, 
-maior cobertura automatizada dos endpoints e validações adicionais nos parâmetros de paginação e ordenação.
+O projeto possui testes automatizados de serviços e testes de integração utilizando Testcontainers com PostgreSQL. 
+Como melhoria futura, a cobertura de testes poderia ser ampliada para contemplar mais cenários e endpoints da aplicação.
 
-Os itens opcionais e bônus não foram priorizados durante a implementação.
+Os itens opcionais e bônus não foram priorizados, mantendo o foco nos requisitos principais do desafio e na organização da solução.
+
 
 ## Observações
 
