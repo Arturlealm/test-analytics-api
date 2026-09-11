@@ -17,12 +17,14 @@ import tech.magicbook.analytics.api.entity.Application;
 import tech.magicbook.analytics.api.entity.EndUser;
 import tech.magicbook.analytics.api.entity.FeatureEvent;
 import tech.magicbook.analytics.api.exception.EndUserNotFoundException;
+import tech.magicbook.analytics.api.exception.InvalidRequestException;
 import tech.magicbook.analytics.api.repository.EndUserRepository;
 import tech.magicbook.analytics.api.repository.FeatureEventRepository;
 import tech.magicbook.analytics.api.specification.FeatureEventSpecification;
 import tech.magicbook.analytics.api.util.UuidGenerator;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,8 @@ public class FeatureEventService {
 
     private final FeatureEventRepository featureEventRepository;
     private final EndUserRepository endUserRepository;
+
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("id", "featureName", "occurredAt");
 
     public FeatureEventService(FeatureEventRepository featureEventRepository, EndUserRepository endUserRepository) {
         this.featureEventRepository = featureEventRepository;
@@ -62,19 +66,28 @@ public class FeatureEventService {
         return toResponse(featureEvent);
     }
 
-    public PaginatedResponse<FeatureEventResponse> list(
-            UUID applicationId,
-            UUID endUserId,
-            String featureName,
-            OffsetDateTime occurredFrom,
-            OffsetDateTime occurredTo,
-            int page,
-            int limit,
-            String sort,
-            String order) {
+    public PaginatedResponse<FeatureEventResponse> list(UUID applicationId, UUID endUserId, String featureName,
+            OffsetDateTime occurredFrom, OffsetDateTime occurredTo,
+            int page, int limit, String sort, String order) {
+
+        if (page < 1) {
+            throw new InvalidRequestException("page must be greater than or equal to 1");
+        }
+
+        if (limit < 1 || limit > 100) {
+            throw new InvalidRequestException("limit must be between 1 and 100");
+        }
+
+        if (!ALLOWED_SORT_FIELDS.contains(sort)) {
+            throw new InvalidRequestException("invalid sort field");
+        }
+
+        if (!order.equalsIgnoreCase("asc") && !order.equalsIgnoreCase("desc")) {
+            throw new InvalidRequestException("order must be asc or desc");
+        }
 
         Sort.Direction direction = order.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
-
+        
         Pageable pageable = PageRequest.of(page - 1, limit, Sort.by(direction, sort));
 
         Specification<FeatureEvent> specification = Specification.where(

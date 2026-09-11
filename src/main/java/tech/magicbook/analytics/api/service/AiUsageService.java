@@ -8,11 +8,13 @@ import tech.magicbook.analytics.api.entity.AiUsage;
 import tech.magicbook.analytics.api.entity.Application;
 import tech.magicbook.analytics.api.entity.EndUser;
 import tech.magicbook.analytics.api.exception.EndUserNotFoundException;
+import tech.magicbook.analytics.api.exception.InvalidRequestException;
 import tech.magicbook.analytics.api.repository.AiUsageRepository;
 import tech.magicbook.analytics.api.repository.EndUserRepository;
 import tech.magicbook.analytics.api.util.UuidGenerator;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -30,6 +32,9 @@ public class AiUsageService {
 
     private final AiUsageRepository aiUsageRepository;
     private final EndUserRepository endUserRepository;
+
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of("id", "provider", "model", "tokens", "cost",
+            "occurredAt");
 
     public AiUsageService(AiUsageRepository aiUsageRepository, EndUserRepository endUserRepository) {
         this.aiUsageRepository = aiUsageRepository;
@@ -76,6 +81,22 @@ public class AiUsageService {
             int limit,
             String sort,
             String order) {
+
+        if (page < 1) {
+            throw new InvalidRequestException("page must be greater than or equal to 1");
+        }
+
+        if (limit < 1 || limit > 100) {
+            throw new InvalidRequestException("limit must be between 1 and 100");
+        }
+
+        if (!ALLOWED_SORT_FIELDS.contains(sort)) {
+            throw new InvalidRequestException("invalid sort field");
+        }
+
+        if (!order.equalsIgnoreCase("asc") && !order.equalsIgnoreCase("desc")) {
+            throw new InvalidRequestException("order must be asc or desc");
+        }
 
         Sort.Direction direction = order.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
 

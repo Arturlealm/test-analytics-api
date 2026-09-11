@@ -1,8 +1,11 @@
 package tech.magicbook.analytics.api.service;
 
+import org.springframework.stereotype.Service;
+
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -10,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 
 import tech.magicbook.analytics.api.dto.CreateEndUserRequest;
 import tech.magicbook.analytics.api.dto.EndUserCreationResult;
@@ -22,6 +24,7 @@ import tech.magicbook.analytics.api.entity.EndUser;
 import tech.magicbook.analytics.api.entity.enums.AgeRange;
 import tech.magicbook.analytics.api.entity.enums.EndUserStatus;
 import tech.magicbook.analytics.api.exception.EndUserNotFoundException;
+import tech.magicbook.analytics.api.exception.InvalidRequestException;
 import tech.magicbook.analytics.api.repository.EndUserRepository;
 import tech.magicbook.analytics.api.specification.EndUserSpecification;
 import tech.magicbook.analytics.api.util.UuidGenerator;
@@ -31,8 +34,18 @@ public class EndUserService {
 
     private final EndUserRepository endUserRepository;
 
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(
+            "id",
+            "externalId",
+            "ageRange",
+            "region",
+            "status",
+            "createdAt",
+            "deletedAt");
+
     public EndUserService(EndUserRepository endUserRepository) {
         this.endUserRepository = endUserRepository;
+
     }
 
     public EndUserCreationResult create(Application application, CreateEndUserRequest request) {
@@ -88,6 +101,22 @@ public class EndUserService {
 
     public PaginatedResponse<EndUserResponse> list(UUID applicationId, EndUserStatus status, AgeRange ageRange,
             String region, int page, int limit, String sort, String order) {
+
+        if (page < 1) {
+            throw new InvalidRequestException("page must be greater than or equal to 1");
+        }
+
+        if (limit < 1 || limit > 100) {
+            throw new InvalidRequestException("limit must be between 1 and 100");
+        }
+
+        if (!ALLOWED_SORT_FIELDS.contains(sort)) {
+            throw new InvalidRequestException("invalid sort field");
+        }
+
+        if (!order.equalsIgnoreCase("asc") && !order.equalsIgnoreCase("desc")) {
+            throw new InvalidRequestException("order must be asc or desc");
+        }
 
         Sort.Direction direction = order.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
 
