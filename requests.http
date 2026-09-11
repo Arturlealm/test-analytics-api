@@ -1,0 +1,68 @@
+### Login admin
+# @name login
+POST http://localhost:8080/v1/auth/tokens
+Content-Type: application/json
+
+{
+  "email": "admin@analytics.local",
+  "password": "admin123"
+}
+
+### Criar aplicação
+# @name createApplication
+POST http://localhost:8080/v1/applications
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.data.accessToken}}
+
+{
+  "name": "Analytics Test Application HTTP",
+  "description": "Application used to demonstrate the Analytics API"
+}
+
+### Gerar API key
+# @name createApiKey
+POST http://localhost:8080/v1/applications/{{createApplication.response.body.data.id}}/api-keys
+Authorization: Bearer {{login.response.body.data.accessToken}}
+
+### Criar end user
+# @name createEndUser
+POST http://localhost:8080/v1/end-users
+Content-Type: application/json
+X-Api-Key: {{createApiKey.response.body.data.key}}
+
+{
+  "externalId": "user-http-001",
+  "ageRange": "25_34",
+  "region": "PE"
+}
+
+### Registrar feature event
+# @name createFeatureEvent
+POST http://localhost:8080/v1/feature-events
+Content-Type: application/json
+X-Api-Key: {{createApiKey.response.body.data.key}}
+
+{
+  "endUserId": "{{createEndUser.response.body.data.id}}",
+  "featureName": "dashboard_view",
+  "occurredAt": "2026-09-11T01:45:00Z",
+  "metadata": {
+    "source": "requests-http",
+    "environment": "test"
+  }
+}
+
+### Registrar AI usage
+# @name createAiUsage
+POST http://localhost:8080/v1/ai-usages
+Content-Type: application/json
+X-Api-Key: {{createApiKey.response.body.data.key}}
+
+{
+  "endUserId": "{{createEndUser.response.body.data.id}}",
+  "provider": "OpenAI",
+  "model": "gpt-5",
+  "tokens": 1250,
+  "cost": 0.015,
+  "occurredAt": "2026-09-11T01:46:00Z"
+}
